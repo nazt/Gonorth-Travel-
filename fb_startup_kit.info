@@ -1,0 +1,7 @@
+name = Facebook Startup Kit
+description = Facebook Startup Kit
+package = Opendream
+core = 6.x
+version = 6.x-0.1-alpha2
+
+dependencies[] = "litetheme"

@@ -1,0 +1,153 @@
+<?php
+/**
+ * Implementation of hook_menu().
+ */
+function fb_startup_kit_menu() {
+  $items['admin/settings/fb_startup_kit'] = array(
+      'title' => 'Facebook Startup Kit',
+      'description' => 'Facebook util settings',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('facebook_startup_kit_settings_form'),
+      'access arguments' => array('administer site configuration'),
+      'type' => MENU_NORMAL_ITEM,
+      'file' => 'fb_startup_kit.admin.inc'
+  );
+
+  $items['facebook/page/startup'] = array(
+    'title' => t('Profile'),
+    'page callback' => 'start_page',
+    'access callback' => TRUE,
+    'file' => 'start_page.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['facebook/util/verify'] = array(
+    'title' => t('Verify FB'),
+    'page callback' => 'fsk_verify_js',
+    'access callback' => 'fsk_verify_js_callback',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['facebook/profile/%user/edit'] = array(
+    'title' => t('Edit Profile'),
+    'page callback' => 'edit_profile',
+    'access callback' => TRUE,
+    'page arguments' => array(2),
+    'type' => MENU_CALLBACK,
+    'file' => 'node.pages.inc',
+    'file path' => drupal_get_path('module', 'node'),
+  );
+
+  $items['facebook/profile'] = $items['facebook/page/startup'];
+  //$items['facebook/profile/%'] = $items['facebook/page/startup'];
+  $items['facebook/profile/edit'] = $items['facebook/profile/%user/edit'];
+
+  $items['facebook/profile/index'] = array(
+    'title' => t('Profile Index'),
+    'page callback' => 'profile_index',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  unset($items['facebook/profile/edit']['page arguments']);
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function facebook_startup_kit_init() {
+
+}
+
+/**
+  * Implementation of hook_perm()
+  */
+function facebook_startup_kit_perm() {
+  return array('administer facebook startup kit');;
+}
+
+/**
+  *  Implementation of hook_block()
+  */
+function fb_startup_kit_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $blocks[0] = array(
+      'info' => t('Map Block Left'),
+      'weight' => 0,
+    );
+
+    $blocks[1] = array(
+      'info' => t('Mymodule block #2 shows ...'),
+      'weight' => 0,
+    );
+
+
+    return $blocks;
+  }
+  else if ($op == 'view') {
+    switch ($delta) {
+        case 0:
+          // Your module will need to define this function to render the block.
+          $block = array(
+            'subject' => t('Title of block #1'),
+            'content' => 'Hello',
+          );
+          break;
+        case 1:
+          // Your module will need to define this function to render the block.
+          $block = array(
+            'subject' => t('Title of block #2'),
+            'content' => "hello",
+          );
+          break;
+      }
+    return $block;
+  }
+}
+
+function profile_index() {
+  return 'I\'m Index';
+}
+
+function edit_profile($account = null) {
+  header('P3P: CP="NOI ADM DEV COM NAV OUR STP"');
+  if ($account == null) {
+    GLOBAL $user;
+    if ($user->uid != 0) {
+      $account = user_load($user->uid);
+    }
+    else {
+      return 'error';
+    }
+  }
+  return content_profile_page_edit('content_profile', $account);
+}
+function fsk_verify_js_callback() {
+  return TRUE;
+}
+
+function fsk_verify_js() {
+  $target = variable_get('facebook_startup_kit_redirect_to_page', 'http://');
+  Header("Location: ${target}");
+  return;
+}
+/**
+
+ * Implementation of hook_form_alter().
+ */
+function fb_startup_kit_form_alter(&$form, &$form_state, $form_id) {
+  switch ($form_id) {
+    case 'content_profile_node_form':
+      unset($form['body_field']['format']);
+      break;
+    case 'travel_plan_node_form':
+      unset($form['body_field']['format']);
+      break;
+    case 'travel_log_node_form':
+      unset($form['body_field']['format']);
+      break;
+
+  }
+}
