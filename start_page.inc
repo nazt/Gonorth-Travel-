@@ -1,7 +1,8 @@
 <?php
 function start_page() {
-  session_start();
   header('P3P: CP="NOI ADM DEV COM NAV OUR STP"');
+
+  session_start();
   require_once(drupal_get_path('module', 'fb_startup_kit') . '/lib/php-sdk/src/facebook.php');
   $css_path = drupal_get_path('module', 'fb_startup_kit') . '/css/custom_style.css';
   $js_path  = drupal_get_path('module', 'fb_startup_kit') . '/js/startup.js';
@@ -79,7 +80,6 @@ function start_page() {
   drupal_add_js($fb_kit_settings, 'setting');
 
   $signed_request = $facebook->getSignedRequest();
-  drupal_set_message('signed--'. print_r($signed_request, 1). '/signed');
   $app_data = $signed_request['app_data'];
 
   /**
@@ -87,36 +87,13 @@ function start_page() {
    */
   if (arg(2) == null) {
     global $user;
-    drupal_goto('facebook/profile/u/' . $user->name);
-  }
-  else {
-
+    $_GET['q'] = 'facebook/profile/u/' . $user->name;
   }
   if ($app_data) {
     $data = explode(':', $app_data);
     if ($data[0] == 'uid') {
-     // $_GET['q'] = 'facebook/profile/u/'. $data[1];
-     drupal_goto('facebook/profile/u/'. $data[1]);
+      $_GET['q'] = 'facebook/profile/u/'. $data[1];
     }
-    drupal_set_message(print_r($data, 1));
-  }
-
-  $come_from = $_SESSION['gonorth_profile_come_from'] += 1;
-  drupal_set_message($_SESSION['gonorth_profile_come_from']);
-  drupal_set_message($_SESSION['gonorth_profile_node_nid']);
-  drupal_set_message($app_data);
-  // hard code -99 is mean come from hook_nodeapi insert content type travel_log
-  drupal_add_js(
-    array('facebook_startup_kit' =>
-      array('come_from' => $_SESSION['gonorth_profile_come_from'])
-    ),
-    'setting');
-  if ($come_from == -99) {
-    drupal_add_js(
-      array('facebook_startup_kit' =>
-        array('come_from_node_nid' => $_SESSION['gonorth_profile_node_nid'])
-      ),
-      'setting');
   }
 
   /**
@@ -128,7 +105,7 @@ function start_page() {
     GLOBAL $user;
     $fb_uid = $user->name;
   }
-  drupal_add_js(array('facebook_startup_kit' => array('viewing_uid' => $fb_uid)), 'setting');
+  drupal_add_js(array('fb_startup_module' => array('viewing_uid' => $fb_uid)), 'setting');
 
   /**
    * Check Profile and redirect if empty profile
@@ -139,6 +116,7 @@ function start_page() {
     drupal_set_title('กรอกข้อมูลส่วนตัว');
     drupal_goto('facebook/profile/edit', 'destination=facebook/profile');
   }
+
   /**
    * Print out facebook tag
    */
@@ -148,4 +126,3 @@ function start_page() {
 FBJS;
   return $output;
 }
-
