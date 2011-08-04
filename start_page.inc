@@ -1,15 +1,18 @@
 <?php
 function start_page() {
-  header('P3P: CP="NOI ADM DEV COM NAV OUR STP"');
-
   session_start();
+  header('P3P: CP="NOI ADM DEV COM NAV OUR STP"');
   require_once(drupal_get_path('module', 'fb_startup_kit') . '/lib/php-sdk/src/facebook.php');
   $css_path = drupal_get_path('module', 'fb_startup_kit') . '/css/custom_style.css';
   $js_path  = drupal_get_path('module', 'fb_startup_kit') . '/js/startup.js';
+  $fbox_js_path  = drupal_get_path('module', 'fb_startup_kit') . '/js/facebox-src/facebox.js';
+  $fbox_css_path  = drupal_get_path('module', 'fb_startup_kit') . '/js/facebox-src/facebox.css';
   $js_date_format= drupal_get_path('module', 'fb_startup_kit') . '/js/date.format.minified.js';
 
   drupal_add_css($css_path);
   drupal_add_js($js_path);
+  drupal_add_js($fbox_js_path);
+  drupal_add_css($fbox_css_path);
   drupal_set_title(t('สมุดบันทึกนักเดินทาง'));
 
 
@@ -65,7 +68,7 @@ function start_page() {
   }
   else {
     $redirect_url = variable_get('facebook_startup_kit_redirect_to_page', 'null');
-    $loginUrl = $facebook->getLoginUrl(array('scope' => 'email, read_stream', 'redirect_uri' => $redirect_url));
+    $loginUrl = $facebook->getLoginUrl(array('scope' => 'email, read_stream, publish_stream', 'redirect_uri' => $redirect_url));
   }
 
   $fb_kit_data = array('apikey' => $api_key,
@@ -80,20 +83,75 @@ function start_page() {
   drupal_add_js($fb_kit_settings, 'setting');
 
   $signed_request = $facebook->getSignedRequest();
+  //drupal_set_message('signed--'. print_r($signed_request, 1). '/signed');
   $app_data = $signed_request['app_data'];
+
+  /**
+   * Got App Data
+   */
+  if ($app_data) {
+    $data = explode(':', $app_data);
+    $type = $data[0];
+    if ($type == 'uid') {
+     // $_GET['q'] = 'facebook/profile/u/'. $data[1];
+     drupal_goto('facebook/profile/u/'. $data[1]);
+    }
+    else if ($type == 'place') {
+      $id = $data[1];
+      drupal_goto('facebook/profile/place/'. $id);
+    }
+    else if ($type == 'plan') {
+      $id = $data[1];
+      drupal_goto('facebook/profile/plan/detail/'. $id);
+    }
+    else if ($type == 'trip' || $type == 'log') {
+      $id = $data[1];
+      drupal_goto('facebook/profile/log/detail/'. $id);
+    }
+  }
 
   /**
    * Change $_GET['q'] if got app_data from tab apps
    */
   if (arg(2) == null) {
     global $user;
-    $_GET['q'] = 'facebook/profile/u/' . $user->name;
+    drupal_goto('facebook/profile/u/' . $user->name);
   }
-  if ($app_data) {
-    $data = explode(':', $app_data);
-    if ($data[0] == 'uid') {
-      $_GET['q'] = 'facebook/profile/u/'. $data[1];
-    }
+  else {
+
+  }
+
+  $come_from = $_SESSION['gonorth_profile_come_from'] += 1;
+  $come_from_nid = $_SESSION['gonorth_profile_node_nid'];
+  $come_from_type = $_SESSION['gonorth_profile_node_type'];
+  $come_from_title = $_SESSION['gonorth_profile_node_title'];
+  $come_from_teaser = $_SESSION['gonorth_profile_node_teaser'];
+  // Hard Code -99 is mean come from hook_nodeapi insert content type travel_log || travel_plan
+  drupal_add_js(
+    array('facebook_startup_kit' =>
+      array('come_from' => $come_from)
+    ),
+    'setting');
+  if ($come_from == -99) {
+    $share_js = drupal_get_path('module', 'fb_startup_kit') . '/js/share.js';
+    drupal_add_js($share_js);
+    $tab_app_url = variable_get('facebook_startup_kit_tab_app_url', 'http://www.');
+    /*
+    $options = array('attributes' => array('class' => 'share-node', 'rel' => 'facebox'), 'absolute' => false, 'fragment' => 'info');
+    $share_link = l("Share node" . $come_from_nid, '', $options);
+    */
+    $share_link = "<a href='#info' rel='facebox' class='share-node'> SHARE </a>";
+    drupal_set_message($share_link);
+    drupal_add_js(
+      array('facebook_startup_kit' =>
+        array('come_from_node_nid' => $come_from_nid,
+              'come_from_node_type' => $come_from_type,
+              'tab_app_url' => $tab_app_url,
+              'come_from_node_title' => $come_from_title,
+              'come_from_node_teaser' => $come_from_teaser,
+             )
+           ),
+      'setting');
   }
 
   /**
@@ -105,7 +163,7 @@ function start_page() {
     GLOBAL $user;
     $fb_uid = $user->name;
   }
-  drupal_add_js(array('fb_startup_module' => array('viewing_uid' => $fb_uid)), 'setting');
+  drupal_add_js(array('facebook_startup_kit' => array('viewing_uid' => $fb_uid)), 'setting');
 
   /**
    * Check Profile and redirect if empty profile
@@ -116,13 +174,20 @@ function start_page() {
     drupal_set_title('กรอกข้อมูลส่วนตัว');
     drupal_goto('facebook/profile/edit', 'destination=facebook/profile');
   }
-
   /**
    * Print out facebook tag
    */
   $output = <<<FBJS
     <div id="fb-root"></div>
     <p class='loading' id='prepare-page'>กรุณารอสักครู่</p>
+    <div id="info" style="display:none;">
+      <p> Hey, I'm the 'info' div! </p>
+      <p> Hey, I'm the 'info' div! </p>
+      <p> Hey, I'm the 'info' div! </p>
+      <p> Hey, I'm the 'info' div! </p>
+      <a href="#share" class = "fb-share">SHARE</a>
+  </div>
 FBJS;
   return $output;
 }
+
