@@ -62,6 +62,25 @@ function facebook_startup_kit_init() {
 }
 
 /**
+ * Implementation of hook_nodeapi
+ */
+function fb_startup_kit_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if ($op == 'insert') {
+    if (empty($node->field_day_plan) && $node->type == 'tourist_attraction') {
+      $node->type = 'text';
+    }
+    else if ($node->type == 'travel_log' || $node->type == 'travel_plan') {
+      $_SESSION['gonorth_profile_come_from'] = -100 ;
+      $_SESSION['gonorth_profile_node_nid'] = $node->nid;
+      $_SESSION['gonorth_profile_node_type'] = $node->type;
+      $_SESSION['gonorth_profile_node_title'] = $node->title;
+      $_SESSION['gonorth_profile_node_teaser'] = $node->teaser;
+    }
+  }
+}
+
+
+/**
   * Implementation of hook_perm()
   */
 function facebook_startup_kit_perm() {
