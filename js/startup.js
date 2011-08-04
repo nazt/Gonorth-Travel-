@@ -8,7 +8,8 @@ window.fbAsyncInit = function() {
     appId  : Drupal.settings.facebook_startup_kit.appid,
     status : true, // check login status
     cookie : true, // enable cookies to allow the server to access the session
-    xfbml  : true  // parse XFBML
+    xfbml  : true,  // parse XFBML
+    channelUrl  : 'http://gonorth-phase2.opendream.in.th/sites/all/static/page/fb_channel.php' // Custom Channel URL
   });
 
 }
