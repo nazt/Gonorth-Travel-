@@ -25,7 +25,6 @@ function facebook_startup_kit_settings_form() {
         '#default_value' => variable_get('facebook_startup_kit_app_secret_key', 'null'),
     );
 
-
     $form['facebook_startup_kit_login_url'] = array(
         '#type' => 'textfiled',
         '#title' => t('login url'),
@@ -38,6 +37,20 @@ function facebook_startup_kit_settings_form() {
         '#title' => t('Page ID'),
         '#description' =>  t('Enter your secret key'),
         '#default_value' => variable_get('facebook_startup_kit_page_id', '153305968014537')
+    );
+
+    $form['facebook_startup_kit_tab_app_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Tab Application url.'),
+        '#description' => 'Enter url to appication url.',
+        '#default_value' => variable_get('facebook_startup_kit_tab_app_url', 'http://www.facebook.com'),
+    );
+
+    $form['facebook_startup_kit_channel_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Facebook Channel url.'),
+        '#description' => 'Enter facebook channel url.',
+        '#default_value' => variable_get('facebook_startup_kit_channel_url', 'http://www'),
     );
 
     $form['facebook_startup_kit_redirect_to_page'] = array(
