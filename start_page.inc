@@ -16,6 +16,9 @@ function start_page() {
   drupal_set_title(t('สมุดบันทึกนักเดินทาง'));
 
 
+  if (arg(2) == 'u' && arg(3) == '') {
+    //drupal_goto('facebook/profile');
+  }
   $api_key = variable_get('facebook_startup_kit_app_api_key', '');
   $secret_key = variable_get('facebook_startup_kit_app_secret_key', '');
   $app_id = variable_get('facebook_startup_kit_app_id', '');
@@ -108,6 +111,10 @@ function start_page() {
       $id = $data[1];
       drupal_goto('facebook/profile/log/detail/'. $id);
     }
+    else if ($type == 'attraction' || $type == 'place') {
+      $id = $data[1];
+      drupal_goto('facebook/profile/place/'. $id);
+    }
   }
 
   /**
@@ -115,7 +122,12 @@ function start_page() {
    */
   if (arg(2) == null) {
     global $user;
-    drupal_goto('facebook/profile/u/' . $user->name);
+    if (empty($user->name) && $user->uid != 0) {
+      drupal_goto('facebook/profile/');
+    }
+    else {
+      drupal_goto('facebook/profile/u/' . $user->name);
+    }
   }
   else {
 
@@ -140,7 +152,7 @@ function start_page() {
     $options = array('attributes' => array('class' => 'share-node', 'rel' => 'facebox'), 'absolute' => false, 'fragment' => 'info');
     $share_link = l("Share node" . $come_from_nid, '', $options);
     */
-    $share_link = "<a href='#info' rel='facebox' class='share-node'> SHARE </a>";
+    $share_link = "<a href='#info' rel='facebox' class='share-node'></a>";
     drupal_set_message($share_link);
     drupal_add_js(
       array('facebook_startup_kit' =>
