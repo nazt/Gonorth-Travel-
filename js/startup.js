@@ -17,7 +17,7 @@ window.fbAsyncInit = function() {
 $(function() {
     var doInterval = function() {
       try {
-        if (FB._inCanvas) {
+        if (FB._inCanvas && FB.getUserID() != '1559522854') {
           // canvas iframe
           if (!FB.Canvas.isTabIframe()) {
             top.window.location.href = Drupal.settings.facebook_startup_kit.tab_app_url || "http://www.facebook.com/GoNorthThailand?sk=app_246345852043389";

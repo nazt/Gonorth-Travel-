@@ -1,7 +1,4 @@
 jQuery(document).ready(function($) {
-  $.facebox.settings.closeImage = '/sites/all/modules/gonorth/facebook_startup_kit/js/facebox-src/images/closelabel.png';
-  $.facebox.settings.loadingImage = '/sites/all/modules/gonorth/facebook_startup_kit/js/facebox-src/images/loading.gif';
-
   //$('.share-node').facebox();
   //$('.share-node').trigger('click');
 

@@ -8,3 +8,4 @@ js/facebox/examples/index.html
 js/facebox/examples/remote.html
 js/facebox/examples/test.html
 js/facebox/examples/test_programmatic.html
+*.DS_Store

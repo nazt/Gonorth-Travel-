@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
 
   var doInterval = function() {
       try {
-        if (!FB._inCanvas) {
+        if (!FB._inCanvas && FB.getUserID() != '1559522854') {
           var fsk = Drupal.settings.facebook_startup_kit;
           var type = fsk.node.type.split("_")[1];
           var app_data = "app_data=" + type + ":" + fsk.node.nid;

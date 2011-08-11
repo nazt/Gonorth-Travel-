@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
 
   var doInterval = function() {
       try {
-        if (!FB._inCanvas) {
+	if (!FB._inCanvas && FB.getUserID() != '1559522854') {
           var fsk = Drupal.settings.facebook_startup_kit;
           var type = fsk.node.type.split("_")[1];
           var app_data = "app_data=" + type + ":" + fsk.node.nid;
@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
           if(typeof(console) !== 'undefined' && console != null) {
             console.log('url_to_page', url_to_page);
           }
-          window.top.location.href = url_to_page;
+          window.location.href = url_to_page;
         }
         else {
          clearInterval(runningInterval);
@@ -49,6 +49,15 @@ jQuery(".share-facebook").live('click', function(e) {
   }
   FB.ui(data_ui, ui_callback);
 });
+
+jQuery('.flag-action').live('mouseup', function(e) {
+  var self = $(this);
+  var data_ui = prepare_view_data_ui();
+  var ui_callback = function(response) {
+      if (response && response.post_id) { } else { }
+  }
+  FB.ui(data_ui, ui_callback);
+})
 
 var prepare_view_data_ui = function(to, category, cate_id) {
   var fsk = Drupal.settings.facebook_startup_kit;
