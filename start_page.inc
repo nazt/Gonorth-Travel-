@@ -133,39 +133,6 @@ function start_page() {
 
   }
 
-  $come_from = $_SESSION['gonorth_profile_come_from'] += 1;
-  $come_from_nid = $_SESSION['gonorth_profile_node_nid'];
-  $come_from_type = $_SESSION['gonorth_profile_node_type'];
-  $come_from_title = $_SESSION['gonorth_profile_node_title'];
-  $come_from_teaser = $_SESSION['gonorth_profile_node_teaser'];
-  // Hard Code -99 is mean come from hook_nodeapi insert content type travel_log || travel_plan
-  drupal_add_js(
-    array('facebook_startup_kit' =>
-      array('come_from' => $come_from)
-    ),
-    'setting');
-  if ($come_from == -99) {
-    $share_js = drupal_get_path('module', 'fb_startup_kit') . '/js/share.js';
-    drupal_add_js($share_js);
-    $tab_app_url = variable_get('facebook_startup_kit_tab_app_url', 'http://www.');
-    /*
-    $options = array('attributes' => array('class' => 'share-node', 'rel' => 'facebox'), 'absolute' => false, 'fragment' => 'info');
-    $share_link = l("Share node" . $come_from_nid, '', $options);
-    */
-    $share_link = "<a href='#info' rel='facebox' class='share-node'></a>";
-    drupal_set_message($share_link);
-    drupal_add_js(
-      array('facebook_startup_kit' =>
-        array('come_from_node_nid' => $come_from_nid,
-              'come_from_node_type' => $come_from_type,
-              'tab_app_url' => $tab_app_url,
-              'come_from_node_title' => $come_from_title,
-              'come_from_node_teaser' => $come_from_teaser,
-             )
-           ),
-      'setting');
-  }
-
   /**
    * GET Facebook UID from argument or drupal user
    *
