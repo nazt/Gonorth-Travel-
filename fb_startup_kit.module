@@ -98,7 +98,6 @@ function fb_startup_kit_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
     }
     else if ($node->type == 'content_profile') {
       global $user;
-      if ($user->name == '896050346') {
         $body = "ยินดีต้อนรับเข้าสู่ระบบสมุดบันทึกนักเดินทาง ท่านสามารถดูสมุดบันทึกของท่านได้ที่ ";
         $body.= l("http://www.facebook.com/GoNorthThailand?sk=app_246345852043389", "http://www.facebook.com/GoNorthThailand?sk=app_246345852043389", array('absolute' => TRUE));
         $body.= " หรือจากหน้า Facebook ของชุมชนคนเที่ยวเหนือ ";
@@ -112,7 +111,6 @@ function fb_startup_kit_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
           'headers' => array('From' => 'admin@gonorththailand.com'),
         );
         drupal_mail_send($message);
-      }
     }
   }
   else if ($op == 'view') {
