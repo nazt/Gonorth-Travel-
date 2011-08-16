@@ -76,6 +76,7 @@ function fb_startup_kit_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       $node->type = 'text';
     }
     else if ($node->type == 'travel_log' || $node->type == 'travel_plan') {
+      require_once(drupal_get_path('module', 'fb_startup_kit') . '/lib/php-sdk/src/facebook.php');
       $_SESSION['gonorth_profile_come_from'] = -100 ;
       $_SESSION['gonorth_profile_node_nid'] = $node->nid;
       $_SESSION['gonorth_profile_node_type'] = $node->type;
@@ -83,6 +84,17 @@ function fb_startup_kit_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       $_SESSION['gonorth_profile_node_teaser'] = $node->teaser;
       $type = explode ("_", $node->type);
       $_REQUEST['destination'] = 'facebook/profile/'. $type[1] . '/detail/'. $node->nid;
+      $api_key = variable_get('facebook_startup_kit_app_api_key', '');
+      $secret_key = variable_get('facebook_startup_kit_app_secret_key', '');
+      $app_id = variable_get('facebook_startup_kit_app_id', '');
+
+      // Create our Application instance (replace this with your appId and secret).
+      $facebook = new Facebook(array(
+        'appId'  => $app_id,
+        'secret' => $secret_key,
+      ));
+      $facebook->setAccessToken($_SESSION['fb_access_token']);
+      //$facebook->api('/me/feed', 'post', array('message' => 'Post Post.'));
     }
     else if ($node->type == 'content_profile') {
       global $user;
