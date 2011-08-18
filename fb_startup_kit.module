@@ -87,6 +87,7 @@ function fb_startup_kit_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       $api_key = variable_get('facebook_startup_kit_app_api_key', '');
       $secret_key = variable_get('facebook_startup_kit_app_secret_key', '');
       $app_id = variable_get('facebook_startup_kit_app_id', '');
+      $tab_app_url = variable_get('facebook_startup_kit_tab_app_url', 'http://www.');
 
       // Create our Application instance (replace this with your appId and secret).
       $facebook = new Facebook(array(
@@ -94,7 +95,27 @@ function fb_startup_kit_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         'secret' => $secret_key,
       ));
       $facebook->setAccessToken($_SESSION['fb_access_token']);
-      //$facebook->api('/me/feed', 'post', array('message' => 'Post Post.'));
+
+      $type = explode('_', $node->type);
+      $app_data = "app_data=" . $type[1] .":" . $node->nid;
+      $link = $tab_app_url . "&" . $app_data;
+
+      $buddies = explode(", ", $node->field_buddies[0]['value']);
+      foreach ($buddies as $buddyId) {
+        $buddy = $facebook->api('/'. $buddyId);
+        $me = $facebook->api('/me');
+        $buddy_name = $buddy['name'];
+        /*
+        $facebook->api('/'. $buddyId .'/feed', 'post',
+            array('picture' => 'http://www.gonorththailand.com/sites/all/themes/clean_profile/images/logo-passport-gonorth.png',
+                  'name'    => $node->title,
+                  'link'    => $link,
+                  'caption' => $buddy_name . ' ได้ไปเที่ยวกับ '.  $me['name'],
+                  'description' => $node->body,
+                 )
+        );
+        */
+      }
     }
     else if ($node->type == 'content_profile') {
       global $user;
